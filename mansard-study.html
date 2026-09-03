@@ -1,0 +1,647 @@
+<title>Mälarhöjden Mansard Study</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+  :root {
+    --paper: #FAF9F5;
+    --panel: #F2F0EA;
+    --ink: #22242A;
+    --muted: #6B6E75;
+    --line: #C9C7BF;
+    --hairline: #DDDBD3;
+    --putz: #ECEAE4;
+    --putz-edge: #B9B7AF;
+    --roof: #2B2D31;
+    --glass: #DDE3E6;
+    --accent: #C2472E;
+    --accent-soft: #C2472E22;
+    --constraint: #3D6B8F;
+    --ok: #4A7A52;
+    --dimtext: #44464C;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #1E2126;
+      --panel: #262A30;
+      --ink: #E8E6E0;
+      --muted: #9DA1A8;
+      --line: #4A4E56;
+      --hairline: #33373E;
+      --putz: #33363C;
+      --putz-edge: #55585F;
+      --roof: #0F1013;
+      --glass: #3E444B;
+      --accent: #E0694A;
+      --accent-soft: #E0694A2A;
+      --constraint: #6FA3C7;
+      --ok: #7FAE87;
+      --dimtext: #C6C9CE;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1E2126;
+    --panel: #262A30;
+    --ink: #E8E6E0;
+    --muted: #9DA1A8;
+    --line: #4A4E56;
+    --hairline: #33373E;
+    --putz: #33363C;
+    --putz-edge: #55585F;
+    --roof: #0F1013;
+    --glass: #3E444B;
+    --accent: #E0694A;
+    --accent-soft: #E0694A2A;
+    --constraint: #6FA3C7;
+    --ok: #7FAE87;
+    --dimtext: #C6C9CE;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0 20px 56px;
+  }
+  .sheet { max-width: 1080px; margin: 0 auto; }
+
+  /* ---- title block ---- */
+  header {
+    border-top: 3px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding: 14px 0 12px;
+    margin: 26px 0 8px;
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 24px;
+  }
+  h1 {
+    font-family: "Archivo Narrow", "Arial Narrow", sans-serif;
+    font-weight: 700; font-size: 27px; letter-spacing: .04em;
+    text-transform: uppercase; margin: 0; text-wrap: balance;
+  }
+  .titlemeta {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 12px; color: var(--muted); display: flex; gap: 18px; flex-wrap: wrap;
+    margin-left: auto;
+  }
+  .lbl {
+    font-family: "Archivo Narrow", "Arial Narrow", sans-serif;
+    font-weight: 600; font-size: 12.5px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ---- definition note ---- */
+  .note {
+    border-left: 3px solid var(--constraint);
+    background: color-mix(in srgb, var(--constraint) 10%, transparent);
+    padding: 10px 16px; margin: 18px 0 22px;
+    max-width: 70ch;
+  }
+  .note p { margin: 4px 0; }
+  .note .lbl { color: var(--constraint); }
+  .mono, td.num, .readout dd {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- main layout ---- */
+  .work { display: flex; gap: 26px; align-items: flex-start; }
+  .canvas { flex: 1 1 620px; min-width: 0; }
+  .canvas svg { width: 100%; height: auto; display: block; }
+  .panel { flex: 0 0 276px; display: flex; flex-direction: column; gap: 18px; }
+  @media (max-width: 900px) { .work { flex-direction: column; } .panel { flex-basis: auto; width: 100%; } }
+
+  .group { display: flex; flex-direction: column; gap: 8px; }
+  .seg { display: flex; border: 1px solid var(--line); }
+  .seg button {
+    flex: 1; padding: 7px 4px; background: none; border: none; cursor: pointer;
+    font-family: "Archivo Narrow", "Arial Narrow", sans-serif;
+    font-weight: 600; font-size: 13.5px; letter-spacing: .05em; color: var(--muted);
+    border-right: 1px solid var(--line);
+  }
+  .seg button:last-child { border-right: none; }
+  .seg button.on { background: var(--ink); color: var(--paper); }
+  .seg button:focus-visible, .chip:focus-visible, input:focus-visible {
+    outline: 2px solid var(--constraint); outline-offset: 1px;
+  }
+
+  .custom { display: none; gap: 10px; }
+  .custom.show { display: flex; }
+  .custom label { flex: 1; font-size: 12.5px; color: var(--muted); }
+  .custom input {
+    width: 100%; padding: 5px 7px; border: 1px solid var(--line);
+    background: var(--paper); color: var(--ink);
+    font-family: "IBM Plex Mono", monospace; font-size: 14px;
+  }
+
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .slider-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .slider-row output { font-family: "IBM Plex Mono", monospace; font-size: 14px; }
+  .slider-note { font-size: 12.5px; color: var(--muted); }
+
+  .check { display: flex; gap: 9px; align-items: flex-start; font-size: 14px; cursor: pointer; }
+  .check input { accent-color: var(--accent); margin-top: 3px; }
+  .check span small { display: block; color: var(--muted); }
+
+  .readout {
+    border: 1px solid var(--line); background: var(--panel); padding: 12px 14px;
+  }
+  .readout dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 5px 14px; }
+  .readout dt { color: var(--muted); font-size: 13.5px; }
+  .readout dd { margin: 0; text-align: right; font-size: 14px; }
+  .readout dd.bad { color: var(--accent); font-weight: 500; }
+  .readout dd.good { color: var(--ok); }
+  .flag {
+    margin-top: 10px; font-size: 13px; padding: 6px 9px;
+    border-left: 3px solid var(--accent); background: var(--accent-soft); display: none;
+  }
+  .flag.show { display: block; }
+
+  /* ---- variants strip ---- */
+  section.variants { margin-top: 34px; }
+  h2 {
+    font-family: "Archivo Narrow", "Arial Narrow", sans-serif;
+    font-weight: 600; font-size: 16px; letter-spacing: .08em; text-transform: uppercase;
+    border-bottom: 1px solid var(--ink); padding-bottom: 5px; margin: 0 0 14px;
+  }
+  .strip { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .chip {
+    border: 1px solid var(--line); background: var(--panel); cursor: pointer;
+    padding: 8px 8px 6px; text-align: left; color: var(--ink); font: inherit;
+  }
+  .chip:hover { border-color: var(--ink); }
+  .chip svg { width: 100%; height: auto; display: block; }
+  .chip .cap { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; margin-top: 5px; color: var(--muted); }
+  .chip .cap b { color: var(--ink); font-weight: 500; }
+  .chip .cap .over { color: var(--accent); }
+
+  /* ---- table ---- */
+  section.solved { margin-top: 34px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { padding: 7px 16px 7px 0; text-align: left; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+  th {
+    font-family: "Archivo Narrow", "Arial Narrow", sans-serif; font-weight: 600;
+    font-size: 12.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+    border-bottom: 1px solid var(--ink);
+  }
+  td.num, th.num { text-align: right; padding-right: 26px; }
+  td .over { color: var(--accent); }
+  .foot { color: var(--muted); font-size: 13px; max-width: 70ch; margin-top: 10px; }
+
+  /* ---- svg drawing classes ---- */
+  .sv-ground { fill: var(--roof); }
+  .sv-facade { fill: var(--putz); stroke: var(--putz-edge); stroke-width: 1; }
+  .sv-roof { stroke: var(--roof); fill: none; stroke-linejoin: round; stroke-linecap: butt; }
+  .sv-win { fill: var(--glass); stroke: var(--putz-edge); stroke-width: 1; }
+  .sv-winbar { stroke: var(--putz-edge); stroke-width: 1; }
+  .sv-dim { stroke: var(--dimtext); stroke-width: 1; fill: none; }
+  .sv-ext { stroke: var(--line); stroke-width: 1; stroke-dasharray: 4 3; fill: none; }
+  .sv-dimtext { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12px; fill: var(--dimtext); }
+  .sv-live { fill: var(--accent); }
+  .sv-livestroke { stroke: var(--accent); }
+  .sv-limit { stroke: var(--constraint); stroke-width: 1.2; stroke-dasharray: 9 4 2 4; fill: none; }
+  .sv-limittext { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; fill: var(--constraint); }
+  .sv-plane45 { stroke: var(--constraint); stroke-width: 1.4; stroke-dasharray: 7 4; fill: none; }
+  .sv-planept { fill: var(--constraint); }
+  .sv-ghost { stroke: var(--constraint); stroke-width: 1.4; stroke-dasharray: 6 4; fill: none; }
+  .sv-arc { stroke: var(--dimtext); stroke-width: 1; fill: none; }
+  .sv-href { stroke: var(--line); stroke-width: .8; stroke-dasharray: 2 3; }
+  .sv-scale { stroke: var(--ink); stroke-width: 1; fill: none; }
+  .sv-scalefill { fill: var(--ink); }
+  .sv-nockbad { fill: var(--accent); }
+  .sv-mini-facade { fill: var(--putz); stroke: var(--putz-edge); }
+  .sv-mini-roof { stroke: var(--roof); fill: none; stroke-linejoin: round; }
+  .sv-mini-limit { stroke: var(--constraint); stroke-dasharray: 5 3; stroke-width: 1; }
+  .sv-mini-ground { stroke: var(--ink); stroke-width: 2; }
+</style>
+
+<div class="sheet">
+  <header>
+    <h1>Gavelfasad — Mansardtakstudie</h1>
+    <div class="titlemeta">
+      <span>MÄLARHÖJDEN · STOCKHOLM</span>
+      <span>BREDD 9 000</span>
+      <span>SKALA ~1:75</span>
+    </div>
+  </header>
+
+  <div class="note">
+    <p class="lbl">Byggnadshöjd — 45°-regeln (PBF 1 kap. 3 §)</p>
+    <p>Byggnadshöjden räknas till skärningen mellan <strong>fasadplanet</strong> och ett plan som med
+    <strong>45° lutning inåt</strong> byggnaden berör taket. För ett mansardtak med nedre fall brantare än 45°
+    och övre fall flackare tangerar planet <strong>brytpunkten</strong>, så:</p>
+    <p class="mono">byggnadshöjd = takfot + L<sub>nedre</sub> · (sin θ − cos θ)</p>
+    <p>Varje meter mansard vid 60° kostar alltså bara <span class="mono">0,37 m</span> byggnadshöjd
+    (0,48 m vid 65°) — det är därför mansardtaket är så generöst mot en byggnadshöjdsgräns.
+    Den blå 45°-linjen i ritningen visar konstruktionen live.
+    Detaljplanens gräns här: <strong>byggnadshöjd 5,0 m</strong> (styrd av avstånd till tomtgräns);
+    nockhöjden är fri och redovisas endast som mått.</p>
+  </div>
+
+  <div class="work">
+    <div class="canvas" id="canvas" aria-label="Gable elevation drawing"></div>
+
+    <aside class="panel">
+      <div class="group">
+        <span class="lbl">Takvinklar (nedre + övre)</span>
+        <div class="seg" role="group" aria-label="Angle preset">
+          <button id="p3060" class="on">60° + 30°</button>
+          <button id="p2565">65° + 25°</button>
+          <button id="pcust">Custom</button>
+        </div>
+        <div class="custom" id="custrow">
+          <label>Nedre °<input id="inL" type="number" min="35" max="80" step="1" value="60"></label>
+          <label>Övre °<input id="inU" type="number" min="10" max="45" step="1" value="30"></label>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="slider-row">
+          <span class="lbl">Nedre takfall, längd</span>
+          <output id="lenOut">2,70 m</output>
+        </div>
+        <input id="lenSlider" type="range" min="1.6" max="5.8" step="0.01" value="2.70">
+        <span class="slider-note">Övre fallet följer med så att taket alltid möter nocken mitt på huset.</span>
+      </div>
+
+      <div class="group">
+        <div class="slider-row">
+          <span class="lbl">Takfot (fasadhöjd)</span>
+          <output id="takfotOut">2,90 m</output>
+        </div>
+        <input id="takfotSlider" type="range" min="1.8" max="4.2" step="0.05" value="2.90">
+        <span class="slider-note">Väggliv upp till nedre takfallets start. 2,90 ≈ +45,35 i förlagan.</span>
+      </div>
+
+      <label class="check">
+        <input type="checkbox" id="lockBygg">
+        <span>Lås byggnadshöjd 5,0 m
+          <small>Solves the takfot so the 45°-plane intersection lands on 5,0.</small>
+        </span>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" id="ghost">
+        <span>Jämför andra vinkelparet
+          <small>Dashed overlay at samma takfot, löst till byggnadshöjd 5,0.</small>
+        </span>
+      </label>
+
+      <div class="readout">
+        <dl>
+          <dt>Övre takfall</dt><dd id="rUpper">—</dd>
+          <dt>Brytpunkt (höjd)</dt><dd id="rBreak">—</dd>
+          <dt>Byggnadshöjd (45°)</dt><dd id="rBygg">—</dd>
+          <dt>Nockhöjd</dt><dd id="rNock">—</dd>
+          <dt>Vindsbredd @ 1,9 m*</dt><dd id="rAttic">—</dd>
+        </dl>
+        <div class="flag" id="flagBygg">Byggnadshöjden överskrider plangränsen 5,0 m.</div>
+        <div class="flag" id="flagGeom">Geometry impossible: lower roof passes the centerline.</div>
+      </div>
+      <p class="foot" style="margin:0">*Interior width where headroom above the attic floor (at takfot) reaches 1,9 m.</p>
+    </aside>
+  </div>
+
+  <section class="variants">
+    <h2>Längdvarianter vid takfot 2,90 — click to load</h2>
+    <div class="strip" id="strip"></div>
+  </section>
+
+  <section class="solved">
+    <h2>Max mansard vid byggnadshöjd 5,0 — bredd 9,0 m · takfot 2,90 m</h2>
+    <div class="tablewrap"><table id="solvedTbl">
+      <thead><tr>
+        <th>Vinklar</th><th class="num">Nedre takfall</th><th class="num">Övre takfall</th>
+        <th class="num">Brytpunkt</th><th class="num">Byggnadshöjd</th><th class="num">Nockhöjd</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table></div>
+    <p class="foot" id="tblFoot"></p>
+  </section>
+</div>
+
+<script>
+(function () {
+  const W = 9.0, HALF = 4.5, BYGGMAX = 5.0;
+  const GF_CEIL = 2.6, JOIST = 0.3, FLOOR2 = GF_CEIL + JOIST, SILL2 = 0.85; // ground-floor room height, bjälklag, upper floor level, window sill above it
+  const rad = d => d * Math.PI / 180;
+  const fmtM = v => v.toFixed(2).replace(".", ",") + " m";
+  const fmtMM = v => Math.round(v * 1000).toLocaleString("sv-SE").replace(/ /g, " ");
+
+  const state = { aL: 60, aU: 30, len: 2.70, takfot: 2.90, lockB: false, ghost: false, preset: "3060" };
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+  // full geometry for angles + lower slope length + takfot (wall height)
+  function solve(aL, aU, len, T) {
+    const runL = len * Math.cos(rad(aL));
+    const riseL = len * Math.sin(rad(aL));
+    const runU = HALF - runL;
+    const ok = runU > 0.05;
+    const lenU = ok ? runU / Math.cos(rad(aU)) : 0;
+    const riseU = ok ? runU * Math.tan(rad(aU)) : 0;
+    const breakH = T + riseL;
+    const nock = breakH + riseU;
+    // 45°-plane tangent: candidate governing points are eave, brytpunkt, nock;
+    // byggnadshöjd = max over them of (height − horizontal distance to facade plane)
+    const cands = [[0, T], [runL, breakH], [HALF, nock]];
+    let bygg = -Infinity, govern = cands[0];
+    cands.forEach(c => { const v = c[1] - c[0]; if (v > bygg) { bygg = v; govern = c; } });
+    return { aL, aU, len, T, runL, riseL, runU, lenU, riseU, breakH, nock, bygg, govern, ok };
+  }
+  // takfot that puts byggnadshöjd exactly at BYGGMAX (given length)
+  function takfotForBygg(aL, aU, len) {
+    const g = solve(aL, aU, len, 0);           // bygg is additive in T
+    return BYGGMAX - g.bygg;
+  }
+  // lower length so byggnadshöjd hits BYGGMAX at a given takfot (brytpunkt governing)
+  function lenForBygg(aL, aU, T) {
+    return (BYGGMAX - T) / (Math.sin(rad(aL)) - Math.cos(rad(aL)));
+  }
+  function atticWidth(g, h) {
+    if (!g.ok) return 0;
+    let x;
+    if (h <= g.riseL) x = h / Math.tan(rad(g.aL));
+    else if (h <= g.riseL + g.riseU) x = g.runL + (h - g.riseL) / Math.tan(rad(g.aU));
+    else return 0;
+    return Math.max(0, W - 2 * x);
+  }
+
+  function currentGeometry() {
+    let { aL, aU, len, takfot } = state;
+    if (state.lockB) {
+      takfot = clamp(takfotForBygg(aL, aU, len), 1.8, 4.2);
+    }
+    state.len = len; state.takfot = takfot;
+    return solve(aL, aU, len, takfot);
+  }
+
+  /* ---------- main drawing ---------- */
+  const S = 56, PADL = 108, PADT = 44, PADB = 66, DIMW = 168;
+  const SVGW = PADL + W * S + DIMW + 14;
+  function X(m) { return PADL + m * S; }
+
+  function draw() {
+    const g = currentGeometry();
+    const topM = g.nock + 0.55;
+    const H = PADT + topM * S + PADB;
+    const Y = m => PADT + (topM - m) * S;
+    const p = [];
+
+    p.push(`<rect class="sv-ground" x="${X(-0.7)}" y="${Y(0)}" width="${(W + 1.4) * S}" height="16"/>`);
+
+    if (g.ok) {
+      const profile = [
+        [0, 0], [0, g.T], [g.runL, g.breakH], [HALF, g.nock],
+        [W - g.runL, g.breakH], [W, g.T], [W, 0]
+      ];
+      const pts = profile.map(([x, y]) => `${X(x)},${Y(y)}`).join(" ");
+      p.push(`<defs><clipPath id="fclip"><polygon points="${pts}"/></clipPath></defs>`);
+      p.push(`<polygon class="sv-facade" points="${pts}"/>`);
+
+      // windows & doors, clipped to the facade
+      let w = "";
+      const win = (x, y, wd, h) => {
+        w += `<rect class="sv-win" x="${X(x)}" y="${Y(y + h)}" width="${wd * S}" height="${h * S}"/>`;
+        w += `<line class="sv-winbar" x1="${X(x + wd / 2)}" y1="${Y(y + h)}" x2="${X(x + wd / 2)}" y2="${Y(y)}"/>`;
+      };
+      win(2.15, FLOOR2 + SILL2, 1.15, 1.25);                // upper floor, fixed to +2,90 floor level
+      win(5.70, FLOOR2 + SILL2, 1.15, 1.25);
+      w += `<rect class="sv-win" x="${X(0.95)}" y="${Y(2.15)}" width="${0.95 * S}" height="${2.15 * S}"/>`;
+      win(2.45, 0.85, 1.55, 1.25);
+      w += `<rect class="sv-win" x="${X(5.35)}" y="${Y(2.25)}" width="${2.1 * S}" height="${2.25 * S}"/>`;
+      w += `<line class="sv-winbar" x1="${X(6.4)}" y1="${Y(2.25)}" x2="${X(6.4)}" y2="${Y(0)}"/>`;
+      // floor construction: ground-floor ceiling and upper floor level
+      w += `<line class="sv-href" x1="${X(0)}" y1="${Y(GF_CEIL)}" x2="${X(W)}" y2="${Y(GF_CEIL)}"/>`;
+      w += `<line class="sv-href" x1="${X(0)}" y1="${Y(FLOOR2)}" x2="${X(W)}" y2="${Y(FLOOR2)}"/>`;
+      w += `<text class="sv-dimtext" x="${X(8.85)}" y="${Y(GF_CEIL) + 12}" text-anchor="end">+2 600</text>`;
+      w += `<text class="sv-dimtext" x="${X(8.85)}" y="${Y(FLOOR2) - 4}" text-anchor="end">GOLV PLAN 2 +2 900</text>`;
+      p.push(`<g clip-path="url(#fclip)">${w}</g>`);
+
+      // interior height chain: 2 600 rumshöjd + 300 bjälklag
+      const chx = X(0.42);
+      p.push(`<line class="sv-dim" x1="${chx}" y1="${Y(0)}" x2="${chx}" y2="${Y(FLOOR2)}"/>`);
+      [Y(0), Y(GF_CEIL), Y(FLOOR2)].forEach(y =>
+        p.push(`<line class="sv-dim" x1="${chx - 4}" y1="${y + 4}" x2="${chx + 4}" y2="${y - 4}"/>`));
+      p.push(`<text class="sv-dimtext" x="${chx + 12}" y="${(Y(0) + Y(GF_CEIL)) / 2}"
+        text-anchor="middle" transform="rotate(-90 ${chx + 12} ${(Y(0) + Y(GF_CEIL)) / 2})">2 600</text>`);
+      p.push(`<text class="sv-dimtext" x="${chx + 9}" y="${(Y(GF_CEIL) + Y(FLOOR2)) / 2 + 4}">300</text>`);
+
+      // roof band
+      const roofPts = [[0, g.T], [g.runL, g.breakH], [HALF, g.nock], [W - g.runL, g.breakH], [W, g.T]]
+        .map(([x, y]) => `${X(x)},${Y(y)}`).join(" ");
+      p.push(`<polyline class="sv-roof" stroke-width="7" points="${roofPts}"/>`);
+
+      // slope length labels along the left slopes
+      const slopeLabel = (x1, y1, x2, y2, txt) => {
+        const mx = (X(x1) + X(x2)) / 2, my = (Y(y1) + Y(y2)) / 2;
+        const ang = Math.atan2(Y(y2) - Y(y1), X(x2) - X(x1)) * 180 / Math.PI;
+        const dx = X(x2) - X(x1), dy = Y(y2) - Y(y1), L = Math.hypot(dx, dy);
+        const ox = (dy / L) * 16, oy = (-dx / L) * 16;
+        p.push(`<text class="sv-dimtext sv-live" x="${mx + ox}" y="${my + oy}"
+          text-anchor="middle" transform="rotate(${ang} ${mx + ox} ${my + oy})">${txt}</text>`);
+      };
+      slopeLabel(0, g.T, g.runL, g.breakH, fmtMM(g.len));
+      slopeLabel(g.runL, g.breakH, HALF, g.nock, fmtMM(g.lenU));
+
+      // angle arcs at left eave and left break
+      const arc = (xm, ym, deg, r) => {
+        const cx = X(xm), cy = Y(ym);
+        p.push(`<line class="sv-href" x1="${cx}" y1="${cy}" x2="${cx + r + 16}" y2="${cy}"/>`);
+        const a = rad(deg);
+        p.push(`<path class="sv-arc" d="M ${cx + r} ${cy} A ${r} ${r} 0 0 0 ${cx + r * Math.cos(a)} ${cy - r * Math.sin(a)}"/>`);
+        const la = a / 2, lr = r + 13;
+        p.push(`<text class="sv-dimtext" x="${cx + lr * Math.cos(la)}" y="${cy - lr * Math.sin(la) + 4}" text-anchor="middle">${deg}°</text>`);
+      };
+      arc(0, g.T, g.aL, 24);
+      arc(g.runL, g.breakH, g.aU, 32);
+
+      /* --- the 45° construction plane --- */
+      const [gx, gh] = g.govern;                       // tangent point
+      const x0 = -0.45, y0 = gh - (gx - x0);           // extended past facade
+      const x1 = gx + 0.55, y1 = gh + 0.55;
+      p.push(`<line class="sv-plane45" x1="${X(x0)}" y1="${Y(y0)}" x2="${X(x1)}" y2="${Y(y1)}"/>`);
+      p.push(`<circle class="sv-planept" cx="${X(0)}" cy="${Y(g.bygg)}" r="4"/>`);
+      p.push(`<circle class="sv-planept" cx="${X(gx)}" cy="${Y(gh)}" r="3"/>`);
+      p.push(`<text class="sv-limittext" x="${X(gx + 0.62)}" y="${Y(y1) - 4}">45°</text>`);
+
+      /* --- left dimension: byggnadshöjd --- */
+      const bx = X(-0.62);
+      p.push(`<line class="sv-ext" x1="${X(0) - 6}" y1="${Y(g.bygg)}" x2="${bx - 6}" y2="${Y(g.bygg)}"/>`);
+      p.push(`<line class="sv-dim sv-livestroke" x1="${bx}" y1="${Y(0)}" x2="${bx}" y2="${Y(g.bygg)}"/>`);
+      [Y(0), Y(g.bygg)].forEach(y =>
+        p.push(`<line class="sv-dim sv-livestroke" x1="${bx - 4}" y1="${y + 4}" x2="${bx + 4}" y2="${y - 4}"/>`));
+      const bad = g.bygg > BYGGMAX + 0.005;
+      p.push(`<text class="sv-dimtext ${bad ? "sv-nockbad" : "sv-live"}" x="${bx - 7}" y="${(Y(0) + Y(g.bygg)) / 2}"
+        text-anchor="middle" transform="rotate(-90 ${bx - 7} ${(Y(0) + Y(g.bygg)) / 2})">BYGGNADSHÖJD ${fmtMM(g.bygg)}</text>`);
+      // byggnadshöjd limit line 5,0
+      p.push(`<line class="sv-limit" x1="${X(-0.7)}" y1="${Y(BYGGMAX)}" x2="${X(1.9)}" y2="${Y(BYGGMAX)}"/>`);
+      p.push(`<text class="sv-limittext" x="${X(-0.68)}" y="${Y(BYGGMAX) - 6}">BH MAX 5 000</text>`);
+    }
+
+    // ghost overlay: the other angle pair, same takfot, solved to byggnadshöjd 4,1
+    if (state.ghost && g.ok) {
+      const [oL, oU] = state.preset === "2565" ? [60, 30] : [65, 25];
+      const alt = solve(oL, oU, clamp(lenForBygg(oL, oU, g.T), 1.6, 4.6), g.T);
+      if (alt.ok) {
+        const gp = [[0, alt.T], [alt.runL, alt.breakH], [HALF, alt.nock], [W - alt.runL, alt.breakH], [W, alt.T]]
+          .map(([x, y]) => `${X(x)},${Y(y)}`).join(" ");
+        p.push(`<polyline class="sv-ghost" points="${gp}"/>`);
+        p.push(`<text class="sv-limittext" x="${X(HALF)}" y="${Y(alt.nock) - 8}" text-anchor="middle">${alt.aL}°+${alt.aU}° @ BH 5,0</text>`);
+      }
+    }
+
+    // right-hand vertical dimensions
+    const dim = (off, h, txt, bad2) => {
+      const dx = X(W) + off;
+      p.push(`<line class="sv-ext" x1="${X(W) + 8}" y1="${Y(h)}" x2="${dx + 6}" y2="${Y(h)}"/>`);
+      p.push(`<line class="sv-dim sv-livestroke" x1="${dx}" y1="${Y(0)}" x2="${dx}" y2="${Y(h)}"/>`);
+      [Y(0), Y(h)].forEach(y =>
+        p.push(`<line class="sv-dim sv-livestroke" x1="${dx - 4}" y1="${y + 4}" x2="${dx + 4}" y2="${y - 4}"/>`));
+      p.push(`<text class="sv-dimtext ${bad2 ? "sv-nockbad" : "sv-live"}" x="${dx - 5}" y="${(Y(0) + Y(h)) / 2}"
+        text-anchor="middle" transform="rotate(-90 ${dx - 5} ${(Y(0) + Y(h)) / 2})">${txt}</text>`);
+    };
+    if (g.ok) {
+      dim(38, g.T, `TAKFOT ${fmtMM(g.T)}`, false);
+      dim(84, g.breakH, `BRYTPUNKT ${fmtMM(g.breakH)}`, false);
+      dim(130, g.nock, `NOCKHÖJD ${fmtMM(g.nock)}`, false);
+    }
+
+    // scale bar
+    const sy = Y(0) + 42;
+    p.push(`<text class="sv-dimtext" x="${X(0)}" y="${sy - 9}">SKALA · METER</text>`);
+    for (let i = 0; i < 5; i += 2) {
+      p.push(`<rect class="sv-scalefill" x="${X(i)}" y="${sy}" width="${S}" height="5"/>`);
+    }
+    p.push(`<rect class="sv-scale" x="${X(0)}" y="${sy}" width="${5 * S}" height="5"/>`);
+    [0, 1, 2, 3, 4, 5].forEach(i =>
+      p.push(`<text class="sv-dimtext" x="${X(i)}" y="${sy + 18}" text-anchor="middle">${i}</text>`));
+
+    document.getElementById("canvas").innerHTML =
+      `<svg viewBox="0 0 ${SVGW} ${H}" role="img" aria-label="Gable elevation, mansard roof ${g.aL} plus ${g.aU} degrees">${p.join("")}</svg>`;
+
+    // readouts
+    const set = (id, v, cls) => { const el = document.getElementById(id); el.textContent = v; el.className = cls || ""; };
+    if (g.ok) {
+      set("rUpper", fmtM(g.lenU));
+      set("rBreak", fmtM(g.breakH));
+      set("rBygg", fmtM(g.bygg), g.bygg > BYGGMAX + 0.005 ? "bad" : "good");
+      set("rNock", fmtM(g.nock));
+      set("rAttic", fmtM(atticWidth(g, 1.9)));
+    } else {
+      ["rUpper", "rBreak", "rBygg", "rNock", "rAttic"].forEach(id => set(id, "—"));
+    }
+    document.getElementById("flagBygg").className = "flag" + (g.ok && g.bygg > BYGGMAX + 0.005 ? " show" : "");
+    document.getElementById("flagGeom").className = "flag" + (!g.ok ? " show" : "");
+
+    document.getElementById("lenSlider").value = state.len.toFixed(2);
+    document.getElementById("takfotSlider").value = state.takfot.toFixed(2);
+    document.getElementById("lenOut").textContent = fmtM(state.len);
+    document.getElementById("takfotOut").textContent = fmtM(state.takfot);
+    document.getElementById("takfotSlider").disabled = state.lockB;
+  }
+
+  /* ---------- mini variant strip (takfot 2,90) ---------- */
+  function miniSVG(gg) {
+    const s = 15, w = 9 * s + 16, top = gg.nock + 0.4, h = top * s + 14;
+    const x = m => 8 + m * s, y = m => 4 + (top - m) * s;
+    let q = "";
+    if (gg.ok) {
+      const pts = [[0, 0], [0, gg.T], [gg.runL, gg.breakH], [HALF, gg.nock], [W - gg.runL, gg.breakH], [W, gg.T], [W, 0]]
+        .map(([a, b]) => `${x(a)},${y(b)}`).join(" ");
+      q += `<polygon class="sv-mini-facade" points="${pts}"/>`;
+      const rp = [[0, gg.T], [gg.runL, gg.breakH], [HALF, gg.nock], [W - gg.runL, gg.breakH], [W, gg.T]]
+        .map(([a, b]) => `${x(a)},${y(b)}`).join(" ");
+      q += `<polyline class="sv-mini-roof" stroke-width="3" points="${rp}"/>`;
+    }
+    q += `<line class="sv-mini-limit" x1="${x(-0.4)}" y1="${y(BYGGMAX)}" x2="${x(9.4)}" y2="${y(BYGGMAX)}"/>`;
+    q += `<line class="sv-mini-ground" x1="${x(-0.4)}" y1="${y(0)}" x2="${x(9.4)}" y2="${y(0)}"/>`;
+    return `<svg viewBox="0 0 ${w} ${h}">${q}</svg>`;
+  }
+
+  function buildStrip() {
+    const T0 = 2.90;
+    const strip = document.getElementById("strip");
+    strip.innerHTML = "";
+    [[60, 30], [65, 25]].forEach(([aL, aU]) => {
+      [3.0, 4.0, 5.0].forEach(len => {
+        const gg = solve(aL, aU, len, T0);
+        const overB = gg.bygg > BYGGMAX + 0.005;
+        const btn = document.createElement("button");
+        btn.className = "chip";
+        btn.innerHTML = miniSVG(gg) +
+          `<div class="cap"><b>${aL}°+${aU}°</b> · nedre ${fmtM(len)}<br>` +
+          `bh <span class="${overB ? "over" : ""}">${fmtM(gg.bygg)}</span>` +
+          ` · nock ${fmtM(gg.nock)}</div>`;
+        btn.addEventListener("click", () => {
+          state.aL = aL; state.aU = aU; state.len = len; state.takfot = T0;
+          state.lockB = false;
+          state.preset = aL === 60 ? "3060" : "2565";
+          document.getElementById("lockBygg").checked = false;
+          setSeg(); draw();
+        });
+        strip.appendChild(btn);
+      });
+    });
+  }
+
+  /* ---------- governed-limit table ---------- */
+  function buildTable() {
+    const T0 = 2.90;
+    const rows = [];
+    [[60, 30], [65, 25]].forEach(([aL, aU]) => {
+      const gg = solve(aL, aU, lenForBygg(aL, aU, T0), T0);
+      rows.push(`<tr><td>${aL}° + ${aU}°</td>` +
+        `<td class="num">${fmtM(gg.len)}</td><td class="num">${fmtM(gg.lenU)}</td>` +
+        `<td class="num">${fmtM(gg.breakH)}</td>` +
+        `<td class="num">${fmtM(gg.bygg)}</td>` +
+        `<td class="num">${fmtM(gg.nock)}</td></tr>`);
+    });
+    document.querySelector("#solvedTbl tbody").innerHTML = rows.join("");
+    document.getElementById("tblFoot").textContent =
+      "Största möjliga mansard per vinkelpar när byggnadshöjden precis når detaljplanens 5,0 m " +
+      "(45°-regeln, brytpunkten tangeras). Nockhöjden är oreglerad och redovisas endast som mått. " +
+      "Ett brantare nedre fall når gränsen tidigare eftersom sin θ − cos θ växer med vinkeln.";
+  }
+
+  /* ---------- controls ---------- */
+  const segBtns = { p3060: "3060", p2565: "2565", pcust: "cust" };
+  function setSeg() {
+    Object.keys(segBtns).forEach(id =>
+      document.getElementById(id).className = segBtns[id] === state.preset ? "on" : "");
+    document.getElementById("custrow").className = "custom" + (state.preset === "cust" ? " show" : "");
+  }
+  document.getElementById("p3060").addEventListener("click", () => {
+    state.preset = "3060"; state.aL = 60; state.aU = 30; setSeg(); draw();
+  });
+  document.getElementById("p2565").addEventListener("click", () => {
+    state.preset = "2565"; state.aL = 65; state.aU = 25; setSeg(); draw();
+  });
+  document.getElementById("pcust").addEventListener("click", () => {
+    state.preset = "cust";
+    document.getElementById("inL").value = state.aL;
+    document.getElementById("inU").value = state.aU;
+    setSeg(); draw();
+  });
+  ["inL", "inU"].forEach(id => document.getElementById(id).addEventListener("input", () => {
+    const vL = parseFloat(document.getElementById("inL").value);
+    const vU = parseFloat(document.getElementById("inU").value);
+    if (vL > vU && vL >= 35 && vL <= 80 && vU >= 5 && vU <= 45) { state.aL = vL; state.aU = vU; draw(); }
+  }));
+  document.getElementById("lenSlider").addEventListener("input", e => {
+    state.len = parseFloat(e.target.value); draw();
+  });
+  document.getElementById("takfotSlider").addEventListener("input", e => {
+    state.takfot = parseFloat(e.target.value); draw();
+  });
+  document.getElementById("lockBygg").addEventListener("change", e => {
+    state.lockB = e.target.checked; draw();
+  });
+  document.getElementById("ghost").addEventListener("change", e => {
+    state.ghost = e.target.checked; draw();
+  });
+
+  buildStrip(); buildTable(); draw();
+})();
+</script>
