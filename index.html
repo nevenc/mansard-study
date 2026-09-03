@@ -18,25 +18,6 @@
     --ok: #4A7A52;
     --dimtext: #44464C;
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --paper: #1E2126;
-      --panel: #262A30;
-      --ink: #E8E6E0;
-      --muted: #9DA1A8;
-      --line: #4A4E56;
-      --hairline: #33373E;
-      --putz: #33363C;
-      --putz-edge: #55585F;
-      --roof: #0F1013;
-      --glass: #3E444B;
-      --accent: #E0694A;
-      --accent-soft: #E0694A2A;
-      --constraint: #6FA3C7;
-      --ok: #7FAE87;
-      --dimtext: #C6C9CE;
-    }
-  }
   :root[data-theme="dark"] {
     --paper: #1E2126;
     --panel: #262A30;
@@ -143,6 +124,12 @@
     background: var(--paper); color: var(--ink);
     font-family: "IBM Plex Mono", monospace; font-size: 14px;
   }
+  .widthwrap { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); }
+  .widthwrap input {
+    width: 76px; padding: 4px 6px; border: 1px solid var(--line);
+    background: var(--paper); color: var(--ink); text-align: right;
+    font-family: "IBM Plex Mono", monospace; font-size: 14px;
+  }
 
   input[type="range"] { width: 100%; accent-color: var(--accent); }
   .slider-row { display: flex; justify-content: space-between; align-items: baseline; }
@@ -197,7 +184,7 @@
   }
   td.num, th.num { text-align: right; padding-right: 26px; }
   td .over { color: var(--accent); }
-  .foot { color: var(--muted); font-size: 13px; max-width: 70ch; margin-top: 10px; }
+  .foot { color: var(--muted); font-size: 13px; max-width: 100ch; margin-top: 10px; }
 
   footer.colophon {
     margin-top: 44px; padding-top: 10px;
@@ -240,9 +227,9 @@
     <h1>Gavelfasad — Mansardtakstudie</h1>
     <div class="titlemeta">
       <span>MÄLARHÖJDEN · STOCKHOLM</span>
-      <span>BREDD 9 000</span>
+      <span id="breddMeta">BREDD 9 000</span>
       <span>SKALA ~1:75</span>
-      <button id="themeBtn" class="theme" aria-label="Växla ljust/mörkt läge">AUTO</button>
+      <button id="themeBtn" class="theme" aria-label="Växla ljust/mörkt läge">LJUS</button>
     </div>
   </header>
 
@@ -274,6 +261,14 @@
           <label>Nedre °<input id="inL" type="number" min="35" max="80" step="1" value="60"></label>
           <label>Övre °<input id="inU" type="number" min="10" max="45" step="1" value="30"></label>
         </div>
+      </div>
+
+      <div class="group">
+        <div class="slider-row">
+          <span class="lbl">Husbredd (gavel)</span>
+          <span class="widthwrap"><input id="widthIn" type="number" min="5000" max="15000" step="100" value="9000"> mm</span>
+        </div>
+        <span class="slider-note">Takfallen möts alltid i nock mitt på denna bredd.</span>
       </div>
 
       <div class="group">
@@ -329,7 +324,7 @@
   </section>
 
   <section class="solved">
-    <h2>Max mansard vid byggnadshöjd 5,0 — bredd 9,0 m · takfot 2,90 m</h2>
+    <h2 id="solvedHead">Max mansard vid byggnadshöjd 5,0 — bredd 9,0 m · takfot 2,90 m</h2>
     <div class="tablewrap"><table id="solvedTbl">
       <thead><tr>
         <th>Vinklar</th><th class="num">Nedre takfall</th><th class="num">Övre takfall</th>
@@ -347,13 +342,12 @@
 
 <script>
 (function () {
-  // theme toggle: auto (follow OS) -> dark -> light
-  const MODES = ["auto", "dark", "light"], LABELS = { auto: "AUTO", dark: "MÖRK", light: "LJUS" };
-  let mode = "auto";
+  // theme toggle: light (default) <-> dark
+  const MODES = ["light", "dark"], LABELS = { light: "LJUS", dark: "MÖRK" };
+  let mode = "light";
   try { if (MODES.includes(localStorage.getItem("theme"))) mode = localStorage.getItem("theme"); } catch (e) {}
   const applyTheme = () => {
-    if (mode === "auto") document.documentElement.removeAttribute("data-theme");
-    else document.documentElement.setAttribute("data-theme", mode);
+    document.documentElement.setAttribute("data-theme", mode);
     document.getElementById("themeBtn").textContent = LABELS[mode];
   };
   document.getElementById("themeBtn").addEventListener("click", () => {
@@ -363,7 +357,9 @@
   });
   applyTheme();
 
-  const W = 9.0, HALF = 4.5, BYGGMAX = 5.0;
+  let W = 9.0, HALF = 4.5;                       // husbredd, settable via widthIn
+  const BYGGMAX = 5.0;
+  const fx = m => m * W / 9;                     // scale fixture x-positions from the 9 m composition
   const GF_CEIL = 2.6, JOIST = 0.3, FLOOR2 = GF_CEIL + JOIST, SILL2 = 0.85; // ground-floor room height, bjälklag, upper floor level, window sill above it
   const rad = d => d * Math.PI / 180;
   const fmtM = v => v.toFixed(2).replace(".", ",") + " m";
@@ -418,10 +414,10 @@
 
   /* ---------- main drawing ---------- */
   const S = 56, PADL = 108, PADT = 44, PADB = 66, DIMW = 168;
-  const SVGW = PADL + W * S + DIMW + 14;
   function X(m) { return PADL + m * S; }
 
   function draw() {
+    const SVGW = PADL + W * S + DIMW + 14;
     const g = currentGeometry();
     const topM = g.nock + 0.55;
     const H = PADT + topM * S + PADB;
@@ -445,17 +441,17 @@
         w += `<rect class="sv-win" x="${X(x)}" y="${Y(y + h)}" width="${wd * S}" height="${h * S}"/>`;
         w += `<line class="sv-winbar" x1="${X(x + wd / 2)}" y1="${Y(y + h)}" x2="${X(x + wd / 2)}" y2="${Y(y)}"/>`;
       };
-      win(2.15, FLOOR2 + SILL2, 1.15, 1.25);                // upper floor, fixed to +2,90 floor level
-      win(5.70, FLOOR2 + SILL2, 1.15, 1.25);
-      w += `<rect class="sv-win" x="${X(0.95)}" y="${Y(2.15)}" width="${0.95 * S}" height="${2.15 * S}"/>`;
-      win(2.45, 0.85, 1.55, 1.25);
-      w += `<rect class="sv-win" x="${X(5.35)}" y="${Y(2.25)}" width="${2.1 * S}" height="${2.25 * S}"/>`;
-      w += `<line class="sv-winbar" x1="${X(6.4)}" y1="${Y(2.25)}" x2="${X(6.4)}" y2="${Y(0)}"/>`;
+      win(fx(2.15), FLOOR2 + SILL2, 1.15, 1.25);            // upper floor, fixed to +2,90 floor level
+      win(fx(5.70), FLOOR2 + SILL2, 1.15, 1.25);
+      w += `<rect class="sv-win" x="${X(fx(0.95))}" y="${Y(2.15)}" width="${0.95 * S}" height="${2.15 * S}"/>`;
+      win(fx(2.45), 0.85, 1.55, 1.25);
+      w += `<rect class="sv-win" x="${X(fx(5.35))}" y="${Y(2.25)}" width="${2.1 * S}" height="${2.25 * S}"/>`;
+      w += `<line class="sv-winbar" x1="${X(fx(5.35) + 1.05)}" y1="${Y(2.25)}" x2="${X(fx(5.35) + 1.05)}" y2="${Y(0)}"/>`;
       // floor construction: ground-floor ceiling and upper floor level
       w += `<line class="sv-href" x1="${X(0)}" y1="${Y(GF_CEIL)}" x2="${X(W)}" y2="${Y(GF_CEIL)}"/>`;
       w += `<line class="sv-href" x1="${X(0)}" y1="${Y(FLOOR2)}" x2="${X(W)}" y2="${Y(FLOOR2)}"/>`;
-      w += `<text class="sv-dimtext" x="${X(8.85)}" y="${Y(GF_CEIL) + 12}" text-anchor="end">+2 600</text>`;
-      w += `<text class="sv-dimtext" x="${X(8.85)}" y="${Y(FLOOR2) - 4}" text-anchor="end">GOLV PLAN 2 +2 900</text>`;
+      w += `<text class="sv-dimtext" x="${X(W - 0.15)}" y="${Y(GF_CEIL) + 12}" text-anchor="end">+2 600</text>`;
+      w += `<text class="sv-dimtext" x="${X(W - 0.15)}" y="${Y(FLOOR2) - 4}" text-anchor="end">GOLV PLAN 2 +2 900</text>`;
       p.push(`<g clip-path="url(#fclip)">${w}</g>`);
 
       // interior height chain: 2 600 rumshöjd + 300 bjälklag
@@ -583,7 +579,7 @@
 
   /* ---------- mini variant strip (takfot 2,90) ---------- */
   function miniSVG(gg) {
-    const s = 15, w = 9 * s + 16, top = gg.nock + 0.4, h = top * s + 14;
+    const s = 15, w = W * s + 16, top = gg.nock + 0.4, h = top * s + 14;
     const x = m => 8 + m * s, y = m => 4 + (top - m) * s;
     let q = "";
     if (gg.ok) {
@@ -594,8 +590,8 @@
         .map(([a, b]) => `${x(a)},${y(b)}`).join(" ");
       q += `<polyline class="sv-mini-roof" stroke-width="3" points="${rp}"/>`;
     }
-    q += `<line class="sv-mini-limit" x1="${x(-0.4)}" y1="${y(BYGGMAX)}" x2="${x(9.4)}" y2="${y(BYGGMAX)}"/>`;
-    q += `<line class="sv-mini-ground" x1="${x(-0.4)}" y1="${y(0)}" x2="${x(9.4)}" y2="${y(0)}"/>`;
+    q += `<line class="sv-mini-limit" x1="${x(-0.4)}" y1="${y(BYGGMAX)}" x2="${x(W + 0.4)}" y2="${y(BYGGMAX)}"/>`;
+    q += `<line class="sv-mini-ground" x1="${x(-0.4)}" y1="${y(0)}" x2="${x(W + 0.4)}" y2="${y(0)}"/>`;
     return `<svg viewBox="0 0 ${w} ${h}">${q}</svg>`;
   }
 
@@ -638,6 +634,8 @@
         `<td class="num">${fmtM(gg.nock)}</td></tr>`);
     });
     document.querySelector("#solvedTbl tbody").innerHTML = rows.join("");
+    document.getElementById("solvedHead").textContent =
+      `Max mansard vid byggnadshöjd 5,0 — bredd ${W.toFixed(1).replace(".", ",")} m · takfot 2,90 m`;
     document.getElementById("tblFoot").textContent =
       "Största möjliga mansard per vinkelpar när byggnadshöjden precis når detaljplanens 5,0 m " +
       "(45°-regeln, brytpunkten tangeras). Nockhöjden är oreglerad och redovisas endast som mått. " +
@@ -673,6 +671,14 @@
   });
   document.getElementById("takfotSlider").addEventListener("input", e => {
     state.takfot = parseFloat(e.target.value); draw();
+  });
+  document.getElementById("widthIn").addEventListener("input", e => {
+    const mm = parseFloat(e.target.value);
+    if (mm >= 5000 && mm <= 15000) {
+      W = mm / 1000; HALF = W / 2;
+      document.getElementById("breddMeta").textContent = `BREDD ${fmtMM(W)}`;
+      buildStrip(); buildTable(); draw();
+    }
   });
   document.getElementById("lockBygg").addEventListener("change", e => {
     state.lockB = e.target.checked; draw();
