@@ -90,6 +90,15 @@
     font-weight: 600; font-size: 12.5px; letter-spacing: .09em;
     text-transform: uppercase; color: var(--muted);
   }
+  .theme {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px; letter-spacing: .06em;
+    padding: 3px 10px; cursor: pointer;
+    background: none; border: 1px solid var(--line); color: var(--muted);
+  }
+  .theme:hover { border-color: var(--ink); color: var(--ink); }
+  .theme:focus-visible { outline: 2px solid var(--constraint); outline-offset: 1px; }
+  .theme::before { content: "◐ "; }
 
   /* ---- definition note ---- */
   .note {
@@ -190,6 +199,15 @@
   td .over { color: var(--accent); }
   .foot { color: var(--muted); font-size: 13px; max-width: 70ch; margin-top: 10px; }
 
+  footer.colophon {
+    margin-top: 44px; padding-top: 10px;
+    border-top: 1px solid var(--ink);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11.5px; letter-spacing: .04em; color: var(--muted);
+  }
+  footer.colophon a { color: var(--muted); text-underline-offset: 2px; }
+  footer.colophon a:hover { color: var(--ink); }
+
   /* ---- svg drawing classes ---- */
   .sv-ground { fill: var(--roof); }
   .sv-facade { fill: var(--putz); stroke: var(--putz-edge); stroke-width: 1; }
@@ -224,6 +242,7 @@
       <span>MÄLARHÖJDEN · STOCKHOLM</span>
       <span>BREDD 9 000</span>
       <span>SKALA ~1:75</span>
+      <button id="themeBtn" class="theme" aria-label="Växla ljust/mörkt läge">AUTO</button>
     </div>
   </header>
 
@@ -320,10 +339,30 @@
     </table></div>
     <p class="foot" id="tblFoot"></p>
   </section>
+
+  <footer class="colophon">
+    © 2026 Neven Cvetkovic
+  </footer>
 </div>
 
 <script>
 (function () {
+  // theme toggle: auto (follow OS) -> dark -> light
+  const MODES = ["auto", "dark", "light"], LABELS = { auto: "AUTO", dark: "MÖRK", light: "LJUS" };
+  let mode = "auto";
+  try { if (MODES.includes(localStorage.getItem("theme"))) mode = localStorage.getItem("theme"); } catch (e) {}
+  const applyTheme = () => {
+    if (mode === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", mode);
+    document.getElementById("themeBtn").textContent = LABELS[mode];
+  };
+  document.getElementById("themeBtn").addEventListener("click", () => {
+    mode = MODES[(MODES.indexOf(mode) + 1) % MODES.length];
+    try { localStorage.setItem("theme", mode); } catch (e) {}
+    applyTheme();
+  });
+  applyTheme();
+
   const W = 9.0, HALF = 4.5, BYGGMAX = 5.0;
   const GF_CEIL = 2.6, JOIST = 0.3, FLOOR2 = GF_CEIL + JOIST, SILL2 = 0.85; // ground-floor room height, bjälklag, upper floor level, window sill above it
   const rad = d => d * Math.PI / 180;
